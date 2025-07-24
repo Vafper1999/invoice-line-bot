@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบสร้างใบแจ้งหนี้ - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #00c851, #007e33);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 3px solid #e9ecef;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #00c851;
+            border-bottom: 3px solid #00c851;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #00c851;
+            box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.1);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00c851, #007e33);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 200, 81, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff4444, #cc0000);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffbb33, #ff8800);
+            color: white;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            border-color: #00c851;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .product-card h3 {
+            color: #00c851;
+            margin-bottom: 10px;
+        }
+
+        .product-info {
+            margin-bottom: 15px;
+        }
+
+        .product-info span {
+            display: inline-block;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin: 2px;
+            font-size: 14px;
+            border: 1px solid #dee2e6;
+        }
+
+        .invoice-form {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            align-items: end;
+        }
+
+        .selected-products {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #e9ecef;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .total-section {
+            background: linear-gradient(45deg, #00c851, #007e33);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .total-section h3 {
+            font-size: 1.8em;
+        }
+
+        .orders-list {
+            margin-top: 20px;
+        }
+
+        .order-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #00c851;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .order-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-expired {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-cancelled {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧾 ระบบสร้างใบแจ้งหนี้</h1>
+            <p>สร้างและส่งใบแจ้งหนี้ผ่าน LINE OA อย่างง่ายดาย</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('products')">📦 จัดการสินค้า</button>
+            <button class="nav-tab" onclick="showTab('invoice')">📄 สร้างใบแจ้งหนี้</button>
+            <button class="nav-tab" onclick="showTab('orders')">📋 รายการคำสั่งซื้อ</button>
+        </div>
+
+        <!-- Products Tab -->
+        <div id="products-tab" class="tab-content active">
+            <h2>จัดการสินค้า</h2>
+            <div class="invoice-form">
+                <h3>เพิ่มสินค้าใหม่</h3>
+                <form id="product-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>ชื่อสินค้า</label>
+                            <input type="text" class="form-control" id="product-name" placeholder="เช่น เสื้อยืดคอกลม" required>
+                        </div>
+                        <div class="form-group">
+                            <label>ขนาด/รุ่น</label>
+                            <input type="text" class="form-control" id="product-size" placeholder="เช่น S, M, L หรือขนาดอื่นๆ">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>น้ำหนัก (กรัม)</label>
+                            <input type="number" class="form-control" id="product-weight" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>ราคา (บาท)</label>
+                            <input type="number" class="form-control" id="product-price" placeholder="0" min="0" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">เพิ่มสินค้า</button>
+                </form>
+            </div>
+
+            <div id="products-list">
+                <h3>รายการสินค้าทั้งหมด</h3>
+                <div class="products-grid" id="products-grid">
+                    <!-- Products will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Tab -->
+        <div id="invoice-tab" class="tab-content">
+            <h2>สร้างใบแจ้งหนี้</h2>
+            <div class="invoice-form">
+                <form id="invoice-form">
+                    <div class="form-group">
+                        <label>LINE User ID ของลูกค้า</label>
+                        <input type="text" class="form-control" id="customer-line-id" placeholder="เช่น U1234567890abcdef..." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>เลือกสินค้า</label>
+                        <select class="form-control" id="product-select">
+                            <option value="">-- เลือกสินค้า --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>จำนวน</label>
+                            <input type="number" class="form-control" id="product-quantity" placeholder="1" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="btn btn-primary" onclick="addProductToInvoice()">เพิ่มสินค้า</button>
+                        </div>
+                    </div>
+
+                    <div class="selected-products" id="selected-products">
+                        <h4>สินค้าที่เลือก</h4>
+                        <div id="invoice-products-list">
+                            <p style="color: #6c757d; text-align: center; padding: 20px;">ยังไม่มีสินค้าในรายการ</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ค่าจัดส่ง (บาท)</label>
+                        <input type="number" class="form-control" id="shipping-cost" placeholder="0" min="0" value="0">
+                    </div>
+
+                    <div class="total-section">
+                        <h3>ยอดรวมทั้งสิ้น: <span id="total-amount">0</span> บาท</h3>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button type="submit" class="btn btn-primary" style="font-size: 18px; padding: 15px 40px;">
+                            🚀 สร้างและส่งใบแจ้งหนี้
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Orders Tab -->
+        <div id="orders-tab" class="tab-content">
+            <h2>รายการคำสั่งซื้อ</h2>
+            <div class="orders-list" id="orders-list">
+                <!-- Orders will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data (in real app, this would come from database)
+        let products = [
+            {
+                id: 1,
+                name: "เสื้อยืดคอกลม",
+                price: 299,
+                size: "S, M, L, XL",
+                weight: 200
+            },
+            {
+                id: 2,
+                name: "กางเกงยีนส์",
+                price: 590,
+                size: "28-36",
+                weight: 500
+            }
+        ];
+
+        let orders = [
+            {
+                id: 1,
+                customerLineId: "U1234567890abcdef",
+                products: [
+                    {name: "เสื้อยืดคอกลม", price: 299, quantity: 2},
+                    {name: "กางเกงยีนส์", price: 590, quantity: 1}
+                ],
+                shipping: 50,
+                total: 1238,
+                status: "active",
+                createdAt: new Date(),
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+            }
+        ];
+
+        let invoiceProducts = [];
+
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+
+            // Load data for specific tabs
+            if (tabName === 'products') {
+                loadProducts();
+            } else if (tabName === 'invoice') {
+                loadProductSelect();
+            } else if (tabName === 'orders') {
+                loadOrders();
+            }
+        }
+
+        // Product management
+        document.getElementById('product-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const product = {
+                id: Date.now(),
+                name: document.getElementById('product-name').value,
+                price: parseInt(document.getElementById('product-price').value),
+                size: document.getElementById('product-size').value,
+                weight: parseInt(document.getElementById('product-weight').value) || 0
+            };
+
+            products.push(product);
+            showAlert('เพิ่มสินค้าเรียบร้อยแล้ว!', 'success');
+            document.getElementById('product-form').reset();
+            loadProducts();
+        });
+
+        function loadProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <h3>${product.name}</h3>
+                    <div class="product-info">
+                        <span>💰 ${product.price.toLocaleString()} บาท</span>
+                        ${product.size ? `<span>📏 ${product.size}</span>` : ''}
+                        ${product.weight ? `<span>⚖️ ${product.weight} กรัม</span>` : ''}
+                    </div>
+                    <button class="btn btn-danger" onclick="deleteProduct(${product.id})">ลบสินค้า</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function deleteProduct(id) {
+            if (confirm('คุณแน่ใจว่าต้องการลบสินค้านี้?')) {
+                products = products.filter(p => p.id !== id);
+                loadProducts();
+                showAlert('ลบสินค้าเรียบร้อยแล้ว!', 'success');
+            }
+        }
+
+        // Invoice management
+        function loadProductSelect() {
+            const select = document.getElementById('product-select');
+            select.innerHTML = '<option value="">-- เลือกสินค้า --</option>';
+            
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = `${product.name} - ${product.price.toLocaleString()} บาท`;
+                select.appendChild(option);
+            });
+        }
+
+        function addProductToInvoice() {
+            const productId = document.getElementById('product-select').value;
+            const quantity = parseInt(document.getElementById('product-quantity').value) || 1;
+
+            if (!productId) {
+                showAlert('กรุณาเลือกสินค้า', 'error');
+                return;
+            }
+
+            const product = products.find(p => p.id == productId);
+            if (!product) return;
+
+            // Check if product already exists in invoice
+            const existingIndex = invoiceProducts.findIndex(p => p.id == productId);
+            if (existingIndex >= 0) {
+                invoiceProducts[existingIndex].quantity += quantity;
+            } else {
+                invoiceProducts.push({
+                    ...product,
+                    quantity: quantity
+                });
+            }
+
+            updateInvoiceDisplay();
+            document.getElementById('product-select').value = '';
+            document.getElementById('product-quantity').value = '1';
+        }
+
+        function updateInvoiceDisplay() {
+            const container = document.getElementById('invoice-products-list');
+            
+            if (invoiceProducts.length === 0) {
+                container.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 20px;">ยังไม่มีสินค้าในรายการ</p>';
+            } else {
+                container.innerHTML = invoiceProducts.map((product, index) => `
+                    <div class="product-item">
+                        <div>
+                            <strong>${product.name}</strong><br>
+                            <small>${product.price.toLocaleString()} บาท × ${product.quantity} = ${(product.price * product.quantity).toLocaleString()} บาท</small>
+                        </div>
+                        <button class="btn btn-danger" onclick="removeFromInvoice(${index})" style="padding: 5px 10px; font-size: 14px;">ลบ</button>
+                    </div>
+                `).join('');
+            }
+
+            updateTotal();
+        }
+
+        function removeFromInvoice(index) {
+            invoiceProducts.splice(index, 1);
+            updateInvoiceDisplay();
+        }
+
+        function updateTotal() {
+            const subtotal = invoiceProducts.reduce((sum, product) => sum + (product.price * product.quantity), 0);
+            const shipping = parseInt(document.getElementById('shipping-cost').value) || 0;
+            const total = subtotal + shipping;
+            
+            document.getElementById('total-amount').textContent = total.toLocaleString();
+        }
+
+        document.getElementById('shipping-cost').addEventListener('input', updateTotal);
+
+        document.getElementById('invoice-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (invoiceProducts.length === 0) {
+                showAlert('กรุณาเพิ่มสินค้าอย่างน้อย 1 รายการ', 'error');
+                return;
+            }
+
+            const customerLineId = document.getElementById('customer-line-id').value;
+            const shipping = parseInt(document.getElementById('shipping-cost').value) || 0;
+            const total = invoiceProducts.reduce((sum, product) => sum + (product.price * product.quantity), 0) + shipping;
+
+            const order = {
+                id: Date.now(),
+                customerLineId: customerLineId,
+                products: [...invoiceProducts],
+                shipping: shipping,
+                total: total,
+                status: 'active',
+                createdAt: new Date(),
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+            };
+
+            orders.push(order);
+            
+            // Reset form
+            document.getElementById('invoice-form').reset();
+            invoiceProducts = [];
+            updateInvoiceDisplay();
+            
+            showAlert(`ส่งใบแจ้งหนี้ไปยัง LINE ID: ${customerLineId} เรียบร้อยแล้ว!`, 'success');
+            
+            // Simulate LINE message sending
+            console.log('Sending LINE Flex Message:', order);
+        });
+
+        // Orders management
+        function loadOrders() {
+            const container = document.getElementById('orders-list');
+            
+            if (orders.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px;">ยังไม่มีรายการคำสั่งซื้อ</p>';
+                return;
+            }
+
+            container.innerHTML = orders.map(order => {
+                const isExpired = new Date() > order.expiresAt;
+                const status = order.status === 'cancelled' ? 'cancelled' : (isExpired ? 'expired' : 'active');
+                const statusText = status === 'cancelled' ? 'ยกเลิกแล้ว' : (status === 'expired' ? 'หมดอายุแล้ว' : 'ใช้งานได้');
+                
+                return `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <h4>คำสั่งซื้อ #${order.id}</h4>
+                                <small>LINE ID: ${order.customerLineId}</small>
+                            </div>
+                            <span class="order-status status-${status}">${statusText}</span>
+                        </div>
+                        <div>
+                            <strong>รายการสินค้า:</strong><br>
+                            ${order.products.map(p => `${p.name} × ${p.quantity} = ${(p.price * p.quantity).toLocaleString()} บาท`).join('<br>')}
+                            <br><strong>ค่าจัดส่ง:</strong> ${order.shipping.toLocaleString()} บาท
+                            <br><strong>ยอดรวม:</strong> ${order.total.toLocaleString()} บาท
+                            <br><small>สร้างเมื่อ: ${order.createdAt.toLocaleString('th-TH')}</small>
+                            <br><small>หมดอายุ: ${order.expiresAt.toLocaleString('th-TH')}</small>
+                        </div>
+                        ${status === 'active' ? `
+                            <div style="margin-top: 15px;">
+                                <button class="btn btn-warning" onclick="cancelOrder(${order.id})">ยกเลิกคำสั่งซื้อ</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function cancelOrder(orderId) {
+            if (confirm('คุณแน่ใจว่าต้องการยกเลิกคำสั่งซื้อนี้?')) {
+                const order = orders.find(o => o.id === orderId);
+                if (order) {
+                    order.status = 'cancelled';
+                    loadOrders();
+                    showAlert('ยกเลิกคำสั่งซื้อเรียบร้อยแล้ว และส่งข้อความแจ้งเตือนไปยังลูกค้าแล้ว', 'success');
+                    
+                    // Simulate sending cancellation message to customer
+                    console.log('Sending cancellation message to:', order.customerLineId);
+                }
+            }
+        }
+
+        // Utility functions
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            const container = document.querySelector('.tab-content.active');
+            container.insertBefore(alert, container.firstChild);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Initialize
+        loadProducts();
+        loadProductSelect();
+        loadOrders();
+    </script>
+</body>
+</html>
